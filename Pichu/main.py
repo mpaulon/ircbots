@@ -29,6 +29,8 @@ class Bot(irc.bot.SingleServerIRCBot):
                  channels=CHANS):
         """."""
         super().__init__(server_list, nickname, realname)
+        self.nickname = nickname
+        self.realname = realname
         self.chans_autojoin = channels
         self.password = PASSWD
         self.email = EMAIL
