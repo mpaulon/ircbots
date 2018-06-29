@@ -1,0 +1,17 @@
+geographiclib==1.49
+geopy==1.14.0
+inflect==0.3.1
+irc==16.3
+jaraco.classes==1.5
+jaraco.collections==1.5.3
+jaraco.functools==1.19
+jaraco.itertools==2.3
+jaraco.logging==1.5.2
+jaraco.stream==1.2
+jaraco.text==1.10.1
+more-itertools==4.2.0
+pkg-resources==0.0.0
+pytz==2018.4
+six==1.11.0
+tempora==1.11
+whois==0.7
