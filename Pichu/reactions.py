@@ -11,6 +11,7 @@ def on_welcome(bot, c, e):
     c.privmsg("NickServ", text='RECOVER {} {}'.format(
         bot.nickname,
         bot.password))
+    c.nick(bot.nickname)
     c.privmsg("NickServ", text='IDENTIFY {}'.format(
         bot.password))
 
