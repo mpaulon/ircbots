@@ -2,6 +2,7 @@
 import importlib
 import irc.bot
 import argparse as ap
+from random import randint
 
 import commands
 import reactions
@@ -28,7 +29,9 @@ class Bot(irc.bot.SingleServerIRCBot):
                  realname=REALNAME,
                  channels=CHANS):
         """."""
-        super().__init__(server_list, nickname, realname)
+        super().__init__(server_list,
+                         nickname + str(randint(0, 1000)),
+                         realname)
         self.nickname = nickname
         self.realname = realname
         self.chans_autojoin = channels

@@ -38,6 +38,6 @@ def do_command(bot, c, e, symb):
         for chan in arguments:
             c.join(chan)
     elif "{}register".format(symb) == command:
-        c.privmsg("NickServ", text='REGISTER {} {}'.format(
+        c.privmsg(target="Mikachu", text='REGISTER {} {}'.format(
             bot.password,
             bot.email))
