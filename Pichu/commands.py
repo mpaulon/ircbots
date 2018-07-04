@@ -1,13 +1,15 @@
 """Define Pichu's commands."""
 from geopy.geocoders import Nominatim
 from geopy.distance import distance
+import traceback
+import sys
 
 
 def locate_addr(value):
     """Get address from name."""
     geolocator = Nominatim()
-    address, (latitude, longitude) = geolocator.geocode(value)
-    return(address, (latitude, longitude))
+    location = geolocator.geocode(value)
+    return(location.address, (location.latitude, location.longitude))
 
 
 def dist_2_points(point_a, point_b):
@@ -29,14 +31,21 @@ def do_command(bot, c, e, symb):
     # Geolocation WIP
     if "{}locate".format(symb) == command and arguments:
         try:
-            address, coords = locate_addr(' '.join(arguments[0]))
-            c.privmsg(e.source.nick, text='{} {}'.format(address, coords))
+            address, coords = locate_addr(arguments[0])
+            if e.type == "pubmsg":
+                c.privmsg(e.target, text='{} {}'.format(address, coords))
+            else:
+                c.privmsg(e.source.nick, text='{} {}'.format(address, coords))
         except:
+            traceback.print_exc(file=sys.stderr)
             c.privmsg(e.source.nick, text='Geolocation failed')
     elif "{}dist".format(symb) == command and len(arguments) == 2:
         try:
             dist = dist_2_points(arguments[0], arguments[1])
-            c.privmsg(e.source.nick, text='{}km'.format(dist))
+            if e.type == "pubmsg":
+                c.privmsg(e.target, text='{}km'.format(dist))
+            else:
+                c.privmsg(e.source.nick, text='{}km'.format(dist))
         except:
             c.privmsg(e.source.nick, text='Distance calculation failed')
     # Random shit
