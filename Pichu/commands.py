@@ -20,7 +20,7 @@ def dist_2_points(point_a, point_b):
 def do_command(bot, c, e, symb):
     """."""
     command = e.arguments[0].split(' ')[0].strip()
-    arguments = ' '.join(e.arguments[0].split(' ')[1:]).split(' ! ')
+    arguments = ' '.join(e.arguments[0].split(' ')[1:]).split(' | ')
     print(e.source.nick, command, arguments)
     bot.notify(c, "{} tried to use {} {}".format(
         e.source.nick,
@@ -39,10 +39,14 @@ def do_command(bot, c, e, symb):
             c.privmsg(e.source.nick, text='{}km'.format(dist))
         except:
             c.privmsg(e.source.nick, text='Distance calculation failed')
+    # Random shit
+
     # Utilities
     elif "{}join".format(symb) == command and arguments:
         for chan in arguments:
             c.join(chan)
+    elif "{}leave".format(symb) == command:
+        c.leave(e.taget)
     elif "{}code".format(symb) == command:
         c.privmsg(e.source.nick, "My code can be found here : {}".format(
             bot.config.get("git")))
@@ -65,9 +69,10 @@ def do_command(bot, c, e, symb):
     # Help
     elif "{}help".format(symb) == command:
         help_strings = [
-            "{}locate: WIP",
-            "{}dist: WIP",
-            "{}join [chan] ... [chan]: makes me join these chans",
+            "{}locate [location]: (WIP) address and GPS coordinates of a location",
+            "{}dist [location1] | [location2]: (WIP) distance in km between 2 locations" ,
+            "{}join [chan] (| [chan] | ... [chan]): makes me join these chans",
+            "{}leave: leave current chan",
             "{}code: display url where my code can be found",
             "{}help: display this",
 
