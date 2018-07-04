@@ -68,7 +68,7 @@ def do_command(bot, c, e, symb):
             "{}locate: WIP",
             "{}dist: WIP",
             "{}join [chan] ... [chan]: makes me join these chans",
-            "{}code: display url where my code can be found"
+            "{}code: display url where my code can be found",
             "{}help: display this",
 
             "admin only: {0}exit(P), {0}reload, {0}register(P), {0}identify(P), {0}recover"
