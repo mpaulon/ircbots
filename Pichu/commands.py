@@ -43,6 +43,9 @@ def do_command(bot, c, e, symb):
     elif "{}join".format(symb) == command and arguments:
         for chan in arguments:
             c.join(chan)
+    elif "{}code".format(symb) == command and e.type == 'privmsg':
+        c.privmsg(e.source.nick, "My code can be found here : {}".format(
+            bot.config.get("git")))
     # Admin commands
     elif ("{}register".format(symb) == command and
           e.source.nick in bot.config.get("admins") and
