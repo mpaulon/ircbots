@@ -31,6 +31,10 @@ class Bot(irc.bot.SingleServerIRCBot):
         """."""
         self.reactions.on_join(self, c, e)
 
+    def on_part(self, c, e):
+        """."""
+        self.reactions.on_part(self, c, e)
+
     def on_pubmsg(self, c, e):
         """."""
         if e.arguments[0][0] == self.config.get("symb"):

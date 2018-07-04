@@ -6,6 +6,13 @@ def on_invite(bot, c, e):
     c.join(e.arguments[0])
 
 
+def on_part(bot, c, e):
+    """."""
+    if e.source.nick == bot.config.get("nickname"):
+        bot.config["channels"].remove(e.target)
+        bot.dump()
+
+
 def on_welcome(bot, c, e):
     """."""
     c.privmsg("NickServ", text='RECOVER {} {}'.format(
@@ -19,11 +26,12 @@ def on_welcome(bot, c, e):
 
 def on_join(bot, c, e):
     """."""
-    bot.notify(c, "{} joined".format(e.target))
-    print(e)
-    if e.target not in bot.config["channels"]:
-        bot.config["channels"] += [str(e.target)]
-        bot.dump()
+    if e.source.nick == bot.config.get("nickname"):
+        bot.notify(c, "{} joined".format(e.target))
+        print(e)
+        if e.target not in bot.config["channels"]:
+            bot.config["channels"] += [str(e.target)]
+            bot.dump()
 
 
 def on_privmsg(bot, c, e):

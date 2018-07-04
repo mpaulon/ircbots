@@ -46,7 +46,7 @@ def do_command(bot, c, e, symb):
         for chan in arguments:
             c.join(chan)
     elif "{}leave".format(symb) == command:
-        c.part(e.taget)
+        c.part(e.target)
     elif "{}code".format(symb) == command:
         c.privmsg(e.source.nick, "My code can be found here : {}".format(
             bot.config.get("git")))
