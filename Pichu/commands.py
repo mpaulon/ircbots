@@ -22,28 +22,53 @@ def do_command(bot, c, e, symb):
     command = e.arguments[0].split(' ')[0].strip()
     arguments = ' '.join(e.arguments[0].split(' ')[1:]).split(' ! ')
     print(e.source.nick, command, arguments)
+    bot.notify(c, "{} tried to use {} {}".format(
+        e.source.nick,
+        command,
+        " ".join(arguments)))
+    # Geolocation WIP
     if "{}locate".format(symb) == command and arguments:
         try:
             address, coords = locate_addr(' '.join(arguments[0]))
-            c.privmsg(e.target, text='{} {}'.format(address, coords))
+            c.privmsg(e.source.nick, text='{} {}'.format(address, coords))
         except:
-            c.privmsg(e.target, text='Geolocation failed')
+            c.privmsg(e.source.nick, text='Geolocation failed')
     elif "{}dist".format(symb) == command and len(arguments) == 2:
         try:
             dist = dist_2_points(arguments[0], arguments[1])
-            c.privmsg(e.target, text='{}km'.format(dist))
+            c.privmsg(e.source.nick, text='{}km'.format(dist))
         except:
-            c.privmsg(e.target, text='Distance calculation failed')
+            c.privmsg(e.source.nick, text='Distance calculation failed')
+    # Utilities
     elif "{}join".format(symb) == command and arguments:
         for chan in arguments:
             c.join(chan)
-    elif "{}register".format(symb) == command:
+    # Admin commands
+    elif ("{}register".format(symb) == command and
+          e.source.nick in bot.config.get("admins") and
+          e.type == 'privmsg'):
         c.privmsg(target="NickServ", text='REGISTER {} {}'.format(
-            bot.password,
-            bot.email))
-    elif "{}identify".format(symb) == command:
-        c.privmsg("NickServ", text='IDENTIFY {}'.format(bot.password))
+            bot.config.get("password"),
+            bot.config.get("email")))
+    elif ("{}identify".format(symb) == command and
+          e.source.nick in bot.config.get("admins") and
+          e.type == 'privmsg'):
+        c.privmsg("NickServ", text='IDENTIFY {}'.format(
+            bot.config.get("password")))
     elif "{}recover".format(symb) == command:
         c.privmsg("NickServ", text='RECOVER {} {}'.format(
-            bot.nickname,
-            bot.password))
+            bot.config.get("nickname"),
+            bot.config.get("password")))
+    # Help
+    elif "{}help".format(symb) == command:
+        help_strings = [
+            "{}locate: WIP",
+            "{}dist: WIP",
+            "{}join [chan] ... [chan]: makes me join these chans",
+            "{}help: display this",
+
+            "admin only: {0}exit, {0}reload, {0}register, {0}identify, {0}recover"
+        ]
+        c.privmsg(e.source.nick, "Available commands: ")
+        for s in help_strings:
+            c.privmsg(e.source.nick, s.format(symb))

@@ -9,15 +9,21 @@ def on_invite(bot, c, e):
 def on_welcome(bot, c, e):
     """."""
     c.privmsg("NickServ", text='RECOVER {} {}'.format(
-        bot.nickname,
-        bot.password))
-    c.nick(bot.nickname)
+        bot.config.get("nickname"),
+        bot.config.get("password")))
+    c.nick(bot.config.get("nickname"))
     c.privmsg("NickServ", text='IDENTIFY {}'.format(
-        bot.password))
+        bot.config.get("password")))
+    bot.notify(c, "Hello master")
+
 
 def on_join(bot, c, e):
     """."""
-    pass
+    bot.notify(c, "{} joined".format(e.target))
+    print(e)
+    if e.target not in bot.config["channels"]:
+        bot.config["channels"] += [str(e.target)]
+        bot.dump()
 
 
 def on_privmsg(bot, c, e):

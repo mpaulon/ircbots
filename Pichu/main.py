@@ -1,48 +1,29 @@
 """Pichu bot."""
 import importlib
 import irc.bot
-import argparse as ap
+# import argparse as ap
+import json
 from random import randint
 
 import commands
 import reactions
 
-SRV_LST = [
-    irc.bot.ServerSpec('irc.crans.org')
-]
-
-NICK = "Pichu"
-REALNAME = "Pichu"
-COMM_SYMB = "!"
-ADMINS = ["Mikachu", "Mikachu_G"]
-CHANS = ["#bots"]
-PASSWD = "EwkhZiOvvdT4A"
-EMAIL = "michael+pichu@paulon.org"
-
 
 class Bot(irc.bot.SingleServerIRCBot):
     """Main bot class."""
 
-    def __init__(self,
-                 server_list=SRV_LST,
-                 nickname=NICK,
-                 realname=REALNAME,
-                 channels=CHANS):
+    def __init__(self):
         """."""
-        super().__init__(server_list,
-                         nickname + str(randint(0, 1000)),
-                         realname)
-        self.nickname = nickname
-        self.realname = realname
-        self.chans_autojoin = channels
-        self.password = PASSWD
-        self.email = EMAIL
-        self.commands = commands.do_command
+        self.config = json.load(open("config", 'r'))
+        super().__init__([irc.bot.ServerSpec(self.config.get("server"))],
+                         self.config.get("nickname") + str(randint(0, 1000)),
+                         self.config.get("realname"))
         self.reactions = reactions
+        self.commands = commands.do_command
 
     def on_welcome(self, c, e):
         """."""
-        for chan in self.chans_autojoin:
+        for chan in self.config.get("channels"):
             c.join(chan)
         self.reactions.on_welcome(self, c, e)
 
@@ -52,14 +33,14 @@ class Bot(irc.bot.SingleServerIRCBot):
 
     def on_pubmsg(self, c, e):
         """."""
-        if e.arguments[0][0] == COMM_SYMB:
+        if e.arguments[0][0] == self.config.get("symb"):
             self.do_command(c, e)
         self.reactions.on_pubmsg(self, c, e)
 
     def on_privmsg(self, c, e):
         """."""
         print(e)
-        if e.arguments[0][0] == COMM_SYMB:
+        if e.arguments[0][0] == self.config.get("symb"):
             self.do_command(c, e)
         self.reactions.on_privmsg(self, c, e)
 
@@ -70,44 +51,41 @@ class Bot(irc.bot.SingleServerIRCBot):
     def do_command(self, c, e):
         """."""
         command = e.arguments[0].split(' ')[0].strip()
-        if ("{}exit".format(COMM_SYMB) == command and
-                e.source.nick in ADMINS and
+        if ("{}exit".format(self.config.get("symb")) == command and
+                e.source.nick in self.config.get("admins") and
                 e.type == 'privmsg'):
             exit(0)
-        elif "{}reload".format(COMM_SYMB) == command:
+        elif ("{}reload".format(self.config.get("symb")) == command and
+                e.source.nick in self.config.get("admins")):
             try:
                 importlib.reload(commands)
                 importlib.reload(reactions)
                 self.commands = commands.do_command
                 self.reactions = reactions
+                self.config = json.load(open("config", 'r'))
                 if e.type == 'privmsg':
                     c.notice(e.source.nick, text="config reloaded")
                 else:
                     c.notice(e.target, text="config reloaded")
+                print("config reloaded")
             except:
                 if e.type == 'privmsg':
                     c.notice(e.source.nick, text="reload failed")
                 else:
                     c.notice(e.target, text="reload failed")
+                print("reload failed")
         else:
             print("plop")
-            self.commands(self, c, e, COMM_SYMB)
+            self.commands(self, c, e, self.config.get("symb"))
 
-if __name__ == "__main__":
-    parser = ap.ArgumentParser(description='Todo list')
-    parser.add_argument('-s', '--server')
-    parser.add_argument('-p', '--port')
-    parser.add_argument('-c', '--chan')
-    parser.add_argument('-n', '--nick')
-    parser.add_argument('-r', '--realname')
+    def dump(self):
+        """Dump config."""
+        open("config", "w").write(json.dumps(self.config, indent=True))
 
-    args = parser.parse_args()
+    def notify(self, c, message):
+        """Notify admins."""
+        for adm in self.config.get("admins"):
+            c.privmsg(adm, text=message)
 
-bot = Bot(
-    server_list=[irc.bot.ServerSpec(args.server)],
-    nickname=args.nick,
-    realname=args.realname,
-    channels=[
-        args.chan
-    ])
+bot = Bot()
 bot.start()
