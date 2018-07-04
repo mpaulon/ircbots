@@ -43,7 +43,7 @@ def do_command(bot, c, e, symb):
     elif "{}join".format(symb) == command and arguments:
         for chan in arguments:
             c.join(chan)
-    elif "{}code".format(symb) == command and e.type == 'privmsg':
+    elif "{}code".format(symb) == command:
         c.privmsg(e.source.nick, "My code can be found here : {}".format(
             bot.config.get("git")))
     # Admin commands
@@ -68,10 +68,11 @@ def do_command(bot, c, e, symb):
             "{}locate: WIP",
             "{}dist: WIP",
             "{}join [chan] ... [chan]: makes me join these chans",
+            "{}code: display url where my code can be found"
             "{}help: display this",
 
-            "admin only: {0}exit, {0}reload, {0}register, {0}identify, {0}recover"
+            "admin only: {0}exit(P), {0}reload, {0}register(P), {0}identify(P), {0}recover"
         ]
-        c.privmsg(e.source.nick, "Available commands: ")
+        c.privmsg(e.source.nick, "Available commands: (P) are privmsg only")
         for s in help_strings:
             c.privmsg(e.source.nick, s.format(symb))
