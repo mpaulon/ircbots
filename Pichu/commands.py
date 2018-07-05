@@ -43,7 +43,7 @@ def do_command(bot, c, e, symb):
         try:
             dist = dist_2_points(arguments[0], arguments[1])
             if e.type == "pubmsg":
-                c.privmsg(e.target, text='{}km'.format(dist))
+                c.privmsg(e.target, text='{:.2f}km'.format(dist))
             else:
                 c.privmsg(e.source.nick, text='{}km'.format(dist))
         except:
