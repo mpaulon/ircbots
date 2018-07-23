@@ -186,7 +186,7 @@ def do_command(bot, c, e, symb):
             "{}join [chan] (| [chan] | ... [chan]): makes me join these chans",
             "{}leave: leave current chan",
             "{}code: display url where my code can be found",
-            "{}remindme: reminder management",
+            # "{}remindme: reminder management",
             "{}help: display this",
 
             "admin only: {0}exit(P), {0}reload, {0}register(P), {0}identify(P), {0}recover"
