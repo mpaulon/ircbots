@@ -6,7 +6,7 @@ import sys
 import re
 import datetime
 import os.path
-
+from weather import Weather, Unit
 
 # regex qui matche une date:
 re_date = re.compile("[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}:[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}")
@@ -26,6 +26,10 @@ def dist_2_points(point_a, point_b):
     _, coo_b = locate_addr(point_b)
     return distance(coo_a, coo_b).km
 
+def get_weather(value):
+    _, (lat, long) = locate_addr(value)
+    weather = Weather(Unit.CELSIUS)
+    return weather.lookup_by_latlng(lat, long)
 
 class Reminder():
     """."""
@@ -99,24 +103,53 @@ def do_command(bot, c, e, symb):
                 c.privmsg(e.source.nick, text='{}km'.format(dist))
         except:
             c.privmsg(e.source.nick, text='Distance calculation failed')
-    # Reminder
-    elif "{}remindme".format(symb) == command:
-        args = arguments[0].strip().split(' ')
-        if args[0] == "list":
-            for n, line in Reminder(e.source.nick).get():
-                c.privmsg(e.source.nick, text="{}: {}".format(n, line))
-            c.privmsg(e.source.nick, text="### END of reminder")
-        elif args[0] == "date":
-                try:
-                    datetime.fromisoformat(args[1])
-                    if :
-                        Reminder(e.source.nick).add({} - {} - {}.format(args[2], "", ))
-                except ValueError:
-                    c.privmsg(e.source.nick, text="Invalid date format, should be YYYY/MM/DD-hh:mm:ss")
-        elif args[0] == "delay":
-            pass
-        elif args[0] == "delete":
-            pass
+    # Meteo
+    elif "{}meteo".format(symb) == command and arguments:
+        try:
+            meteo = get_weather(arguments[0])
+            if len(arguments) == 1:
+                maxi = 1
+            else:
+                maxi = int(arguments[1].strip())
+
+            for n, forecast in enumerate(meteo.forecast):
+                if n < maxi:
+                    if e.type == "pubmsg":
+                        c.privmsg(e.target, text='{}: Weather: {}, Min: {}, Max {}'.format(
+                            forecast.day,
+                            forecast.text,
+                            forecast.low,
+                            forecast.high))
+                    else:
+                        c.privmsg(e.source.nick, text='{}: Weather: {}, Min: {}, Max {}'.format(
+                            forecast.day,
+                            forecast.text,
+                            forecast.low,
+                            forecast.high))
+                else:
+                    break
+        except:
+            traceback.print_exc(file=sys.stderr)
+            c.privmsg(e.source.nick, text='Meteo failed')
+
+    # # Reminder
+    # elif "{}remindme".format(symb) == command:
+    #     args = arguments[0].strip().split(' ')
+    #     if args[0] == "list":
+    #         for n, line in Reminder(e.source.nick).get():
+    #             c.privmsg(e.source.nick, text="{}: {}".format(n, line))
+    #         c.privmsg(e.source.nick, text="### END of reminder")
+    #     elif args[0] == "date":
+    #             try:
+    #                 datetime.fromisoformat(args[1])
+    #                 if :
+    #                     Reminder(e.source.nick).add({} - {} - {}.format(args[2], "", ))
+    #             except ValueError:
+    #                 c.privmsg(e.source.nick, text="Invalid date format, should be YYYY/MM/DD-hh:mm:ss")
+    #     elif args[0] == "delay":
+    #         pass
+    #     elif args[0] == "delete":
+    #         pass
 
     # Utilities
     elif "{}join".format(symb) == command and arguments:
@@ -149,6 +182,7 @@ def do_command(bot, c, e, symb):
 
             "{}locate [location]: address and GPS coordinates of a location",
             "{}dist [location1] | [location2]: distance in km between 2 locations" ,
+            "{}meteo [location] (| [days]): meteo at location for the next days",
             "{}join [chan] (| [chan] | ... [chan]): makes me join these chans",
             "{}leave: leave current chan",
             "{}code: display url where my code can be found",
