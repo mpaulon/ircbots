@@ -2,11 +2,16 @@
 import importlib
 import irc.bot
 # import argparse as ap
+import asyncio
+import threading
 import json
+import traceback
+import sys
 from random import randint
 
 import commands
 import reactions
+import routines
 
 
 class Bot(irc.bot.SingleServerIRCBot):
@@ -15,16 +20,18 @@ class Bot(irc.bot.SingleServerIRCBot):
     def __init__(self):
         """."""
         self.config = json.load(open("config", 'r'))
+        if not self.config.get("debug"):
+            init_nick = self.config.get("nickname") + str(randint(0, 1000))
+        else:
+            init_nick = self.config.get("nickname")
         super().__init__([irc.bot.ServerSpec(self.config.get("server"))],
-                         self.config.get("nickname") + str(randint(0, 1000)),
+                         init_nick,
                          self.config.get("realname"))
         self.reactions = reactions
         self.commands = commands.do_command
 
     def on_welcome(self, c, e):
         """."""
-        for chan in self.config.get("channels"):
-            c.join(chan)
         self.reactions.on_welcome(self, c, e)
 
     def on_join(self, c, e):
@@ -43,7 +50,6 @@ class Bot(irc.bot.SingleServerIRCBot):
 
     def on_privmsg(self, c, e):
         """."""
-        print(e)
         if e.arguments[0][0] == self.config.get("symb"):
             self.do_command(c, e)
         self.reactions.on_privmsg(self, c, e)
@@ -64,8 +70,10 @@ class Bot(irc.bot.SingleServerIRCBot):
             try:
                 importlib.reload(commands)
                 importlib.reload(reactions)
+                importlib.reload(routines)
                 self.commands = commands.do_command
                 self.reactions = reactions
+                self.routines = routines
                 self.config = json.load(open("config", 'r'))
                 if e.type == 'privmsg':
                     c.notice(e.source.nick, text="config reloaded")
@@ -78,6 +86,7 @@ class Bot(irc.bot.SingleServerIRCBot):
                 else:
                     c.notice(e.target, text="reload failed")
                 print("reload failed")
+                traceback.print_exc(file=sys.stderr)
         else:
             print("plop")
             self.commands(self, c, e, self.config.get("symb"))
@@ -91,5 +100,8 @@ class Bot(irc.bot.SingleServerIRCBot):
         for adm in self.config.get("admins"):
             c.privmsg(adm, text=message)
 
-bot = Bot()
-bot.start()
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    bot = Bot()
+    bot_t = threading.Thread(target=bot.start)
+    bot_t.start()

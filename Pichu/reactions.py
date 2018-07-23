@@ -15,13 +15,16 @@ def on_part(bot, c, e):
 
 def on_welcome(bot, c, e):
     """."""
-    c.privmsg("NickServ", text='RECOVER {} {}'.format(
-        bot.config.get("nickname"),
-        bot.config.get("password")))
-    c.nick(bot.config.get("nickname"))
-    c.privmsg("NickServ", text='IDENTIFY {}'.format(
-        bot.config.get("password")))
+    if not bool(bot.config.get("debug")):
+        c.privmsg("NickServ", text='RECOVER {} {}'.format(
+            bot.config.get("nickname"),
+            bot.config.get("password")))
+        c.nick(bot.config.get("nickname"))
+        c.privmsg("NickServ", text='IDENTIFY {}'.format(
+            bot.config.get("password")))
     bot.notify(c, "Hello master")
+    for chan in bot.config.get("channels"):
+        c.join(chan)
 
 
 def on_join(bot, c, e):
