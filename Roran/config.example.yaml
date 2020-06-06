@@ -1,0 +1,11 @@
+server:
+  address: irc.crans.org
+nick: Roran
+realname: Roran
+channels:
+  - "#bots"
+  - "#flood"
+ratelimit:
+  delay: 5
+  message: "Tu l'as vu mon marteau ?"
+
