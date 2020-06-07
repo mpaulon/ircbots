@@ -7,5 +7,7 @@ channels:
   - "#flood"
 ratelimit:
   delay: 5
-  message: "Tu l'as vu mon marteau ?"
+  message: "Tu l'as vu mon marteau ??"
 
+admins:
+  - "Mikachu"

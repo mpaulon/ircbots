@@ -1,10 +1,10 @@
 import argparse
 import logging
-import sys
+
+import colorlog
 
 from core.bot import Bot  # type: ignore
 
-logger = logging.getLogger("roran")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -20,8 +20,18 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    stdout_handler = logging.StreamHandler(sys.stdout)
+    # logging 
+    logger = logging.getLogger("roran")
+
+    format_string = "%(asctime)s - %(levelname)s - %(message)s"
+    stdout_handler = logging.StreamHandler()
+    stdout_formatter = colorlog.ColoredFormatter(f"%(log_color)s {format_string}")
+    stdout_handler.setFormatter(stdout_formatter)
+    file_handler = logging.FileHandler("main.log")
+    file_formatter = logging.Formatter(format_string)
+    file_handler.setFormatter(file_formatter)
     logger.addHandler(stdout_handler)
+    logger.addHandler(file_handler)
 
     if args.verbose == 0:
         logger.setLevel(logging.INFO)
