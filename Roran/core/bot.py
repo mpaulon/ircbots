@@ -64,7 +64,7 @@ class Bot(irc.bot.SingleServerIRCBot):
             if c is not None:
                 trace = traceback.format_exc()
                 self.logger.error(trace)
-                for line in trace.split():
+                for line in trace.split("\n"):
                     self.notify(c, line)
 
     def _get_command(self, message: str):
@@ -87,11 +87,19 @@ class Bot(irc.bot.SingleServerIRCBot):
         self.logger.debug(str(e))
         self.reactions.on_join(self, c, e)
 
+    def on_invite(self, c: irc.client.ServerConnection, e: irc.client.Event):
+        self.logger.debug(str(e))
+        self.reactions.on_invite(self, c, e)
+
     def on_pubmsg(self, c: irc.client.ServerConnection, e: irc.client.Event):
         self.logger.debug(str(e))
         self.reactions.on_pubmsg(self, c, e)
         if action := self._get_command(e.arguments[0]):
             self.commands.apply(self, c, e, action[0], action[1])
+
+    def on_namreply(self, c: irc.client.ServerConnection, e: irc.client.Event):
+        self.logger.debug(str(e))
+        self.reactions.on_namreply(self, c, e)
 
     def on_privmsg(self, c: irc.client.ServerConnection, e: irc.client.Event):
         self.logger.debug(str(e))
