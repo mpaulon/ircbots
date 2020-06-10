@@ -9,7 +9,13 @@ def on_pubmsg(self, c, e):
         if self.cache["ratelimit"].get(e.target) is None:
             self.cache["ratelimit"][e.target] = dict()
         last_spoken = self.cache["ratelimit"][e.target].get(e.source)
-        if last_spoken is not None and last_spoken + datetime.timedelta(seconds=self.config["ratelimit"].get("delay", 10)) > datetime.datetime.now():
+        if (
+                last_spoken is not None and
+                last_spoken + datetime.timedelta(
+                    seconds=self.config["ratelimit"].get("delay", 10)
+                ) > datetime.datetime.now() and (
+                    self.config.get("blacklist") is None or
+                    e.source.nick in self.config["ratelimit"].get("blacklist"))):
             self.logger.info(f"{e.source} exceeds ratelimit")
             if self.config["ratelimit"].get("notify", False):
                 c.privmsg(e.target, f"{e.source.nick} parle trop vite")
@@ -19,6 +25,15 @@ def on_pubmsg(self, c, e):
 
 def on_privmsg(self, c, e):
     pass
+
+
+def on_namreply(self, c, e):
+    pass
+
+
+def on_invite(self, c, e):
+    if e.source.nick not in self.config.get("blacklist"):
+        c.join(e.arguments[0])
 
 
 def on_join(self, c, e):
