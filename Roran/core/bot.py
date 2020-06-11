@@ -33,6 +33,19 @@ class Bot(irc.bot.SingleServerIRCBot):
         self.commands = commands
         signal.signal(signal.SIGHUP, self._handle_signals)
         self.modules = []
+        self._load_modules()
+
+    def _load_modules(self):
+        self.logger.info("Loading modules")
+        self.modules = []
+        for module_name in self.config.get("modules", []):
+            self.logger.debug(f"Loading module {module_name}")
+            try:
+                module = importlib.import_module("modules." + module_name)
+                module = importlib.reload(module)
+                self.modules.append(module)
+            except Exception:
+                self.logger.error(f"Failed loading module {module_name}")
 
     def _handle_signals(self, number, frame):
         self.logger.info(f"Received signal {number}")
@@ -58,6 +71,8 @@ class Bot(irc.bot.SingleServerIRCBot):
             self.logger.debug(f"Reloading reactions")
             importlib.reload(reactions)
             self.reactions = reactions
+            self.logger.debug("Reloading modules")
+            self._load_modules()
             self.logger.info(f"Reloading done")
         except Exception:
             self.logger.error(f"Reloading failed")
@@ -82,27 +97,41 @@ class Bot(irc.bot.SingleServerIRCBot):
     def on_welcome(self, c: irc.client.ServerConnection, e: irc.client.Event):
         self.logger.debug(str(e))
         self.reactions.on_welcome(self, c, e)
+        for module in self.modules:
+            module.on_welcome(self, c, e)
 
     def on_join(self, c: irc.client.ServerConnection, e: irc.client.Event):
         self.logger.debug(str(e))
         self.reactions.on_join(self, c, e)
+        for module in self.modules:
+            module.on_join(self, c, e)
 
     def on_invite(self, c: irc.client.ServerConnection, e: irc.client.Event):
         self.logger.debug(str(e))
         self.reactions.on_invite(self, c, e)
+        for module in self.modules:
+            module.on_invite(self, c, e)
 
     def on_pubmsg(self, c: irc.client.ServerConnection, e: irc.client.Event):
         self.logger.debug(str(e))
         self.reactions.on_pubmsg(self, c, e)
         if action := self._get_command(e.arguments[0]):
             self.commands.apply(self, c, e, action[0], action[1])
+            for module in self.modules:
+                module.apply_command(self, c, e, action[0], action[1])
 
     def on_namreply(self, c: irc.client.ServerConnection, e: irc.client.Event):
         self.logger.debug(str(e))
         self.reactions.on_namreply(self, c, e)
+        for module in self.modules:
+            module.on_namreply(self, c, e)
 
     def on_privmsg(self, c: irc.client.ServerConnection, e: irc.client.Event):
         self.logger.debug(str(e))
         self.reactions.on_privmsg(self, c, e)
+        for module in self.modules:
+            module.on_privmsg(self, c, e)
         if action := self._get_command(e.arguments[0]):
             self.commands.apply(self, c, e, action[0], action[1])
+            for module in self.modules:
+                module.apply_command(self, c, e, action[0], action[1])
