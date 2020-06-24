@@ -39,6 +39,9 @@ class Bot(irc.bot.SingleServerIRCBot):
         self._load_modules()
 
     def _load_modules(self):
+        self.logger.info("Stopping old modules")
+        for module in self.modules:
+            module.stop()
         self.logger.info("Loading modules")
         self.modules = []
         for module_name in self.config.get("modules", []):
@@ -49,6 +52,9 @@ class Bot(irc.bot.SingleServerIRCBot):
                 self.modules.append(module)
             except Exception:
                 self.logger.error(f"Failed loading module {module_name}")
+        self.logger.info("Starting modules")
+        for module in self.modules:
+            module.start()
 
     def _handle_signals(self, number, frame):
         self.logger.info(f"Received signal {number}")

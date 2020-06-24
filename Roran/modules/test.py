@@ -1,3 +1,11 @@
+def start():
+    return
+
+
+def stop():
+    return
+
+
 def apply_command(self, c, e, command, arguments):
     pass
 

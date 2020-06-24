@@ -2,6 +2,14 @@ import datetime
 import re
 
 
+def start():
+    return
+
+
+def stop():
+    return
+
+
 def apply_command(self, c, e, command, arguments):
     destination = e.target if e.type == "pubmsg" else e.source.nick
     if command == "mark":

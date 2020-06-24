@@ -1,6 +1,14 @@
 import datetime
 
 
+def start():
+    return
+
+
+def stop():
+    return
+
+
 def apply_command(self, c, e, command, arguments):
     destination = e.target if e.type == "pubmsg" else e.source.nick
     if e.type == "pubmsg" and e.source in self.config.get("admins"):
