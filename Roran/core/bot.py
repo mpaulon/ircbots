@@ -6,13 +6,16 @@ import traceback
 
 import yaml
 import irc.bot  # type: ignore
-
+import irc.client
+from jaraco.stream import buffer
 
 from core import reactions, commands
 
 
 class Bot(irc.bot.SingleServerIRCBot):
     def __init__(self, config: str, logger):
+        irc.client.ServerConnection.buffer_class = buffer.LenientDecodingLineBuffer
+
         self.logger = logger
         self.config_path = config
         self._load_config()
