@@ -1,5 +1,6 @@
 # python things
 __pycache__
+.mypy_cache
 
 # venv 
 env/
