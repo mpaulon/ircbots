@@ -45,7 +45,11 @@ def apply_command(self, c, e, command, arguments):
                 with open("files/core/marks.txt", "a") as bookmarks:
                     self.logger.debug(f"Saving bookmark {url}")
                     bookmarks.write(f"{tag} {url} ## {comments} ## {e.source.nick} ## {destination} ## {datetime.datetime.now()}\n")
-                    c.privmsg(destination, "Bookmark saved")
+                    site_url = self.config.get("module-bookmarks", dict()).get("site_url")
+                    if site_url is not None:
+                        c.privmsg(destination, f"Bookmark saved, it can be viewed on {site_url}")
+                    else:
+                        c.privmsg(destination, "Bookmark saved")
     if command == "search":
         if len(arguments) > 1 and arguments[0] == "mark":
             try:
