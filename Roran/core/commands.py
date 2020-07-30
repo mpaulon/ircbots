@@ -13,7 +13,10 @@ def apply(self, c, e, command, arguments):
         with open("files/core/joke.txt", "r") as joke_file:
             for line in joke_file:
                 c.privmsg(destination, line.strip("\n"))
-
+    if command == "dalek":
+        with open("files/core/dalek.txt", "r") as dalek_file:
+            for line in dalek_file:
+                c.privmsg(destination, line.strip("\n"))
     if command == "cookie":
         if len(arguments) > 0:
             c.privmsg(destination, f"Congratulations {' '.join(arguments)}, you deserve a cookie ! 🍪")
