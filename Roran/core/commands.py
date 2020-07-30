@@ -52,5 +52,19 @@ def apply(self, c, e, command, arguments):
             return
         # commandes en privé
         if e.type == "privmsg":
-            if command == "config":
-                c.privmsg(destination, str(self.config))
+#            if command == "config":
+#                c.privmsg(destination, str(self.config))
+            if command == "register":
+                self.logger.debug("Registering")
+                c.privmsg(target="NickServ", text='REGISTER {} {}'.format(
+                    self.config.get("password"),
+                    self.config.get("email")))
+            if command == "identify":
+                self.logger.debug("Identifying")
+                c.privmsg("NickServ", text='IDENTIFY {}'.format(
+                    self.config.get("password")))
+            if command == "recover":
+                self.logger.debug("Recovering")
+                c.privmsg("NickServ", text='RECOVER {} {}'.format(
+                    self.config.get("nick"),
+                    self.config.get("password")))

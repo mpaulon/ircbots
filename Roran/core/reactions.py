@@ -19,9 +19,15 @@ def on_invite(self, c, e):
 def on_join(self, c, e):
     if e.source.nick == self.config.get("nick"):
         self.logger.info(f"Joined {e.target}")
-        self.notify(c, f"Joined {e.target}")
 
 
 def on_welcome(self, c, e):
+    if self.config.get("password"):
+        c.privmsg("NickServ", text='RECOVER {} {}'.format(
+            self.config.get("nick"),
+            self.config.get("password")))
+        c.nick(self.config.get("nick"))
+        c.privmsg("NickServ", text='IDENTIFY {}'.format(
+            self.config.get("password")))
     for chan in self.config.get("channels", []):
         c.join(chan)
