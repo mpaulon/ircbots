@@ -13,6 +13,14 @@ def apply(self, c, e, command, arguments):
         with open("files/core/joke.txt", "r") as joke_file:
             for line in joke_file:
                 c.privmsg(destination, line.strip("\n"))
+    if command == "bilan_moral":
+        c.privmsg(destination, "Cette année le moral a été bon.")
+    if command == "bilan_technique":
+        c.privmsg(destination, "Cette année la technique a été bonne.")
+    if command == "bilan_financier":
+        c.privmsg(destination, "Cette année les financiers étaient bons.")
+    if command == "bilan_mere":
+        c.privmsg(destination, "Cette année ta mère a été bonne.")
     if command == "dalek":
         with open("files/core/dalek.txt", "r") as dalek_file:
             for line in dalek_file:
@@ -21,10 +29,13 @@ def apply(self, c, e, command, arguments):
         if len(arguments) > 0:
             c.privmsg(destination, f"Congratulations {' '.join(arguments)}, you deserve a cookie ! 🍪")
         return
-        with open("file/core/cookie.txt", "r") as cookie_file:
+        with open("files/core/cookie.txt", "r") as cookie_file:
             for line in cookie_file:
                 c.privmsg(destination, line.strip("\n"))
-
+    if command == "zayo":
+        with open("files/core/zayo.txt", "r") as zayo_file:
+            for line in zayo_file:
+                c.privmsg(destination, line.strip("\n"))
     if command == "help":
         c.privmsg(destination, "no help for now, but the code says it works")
 
