@@ -36,6 +36,10 @@ def apply(self, c, e, command, arguments):
         with open("files/core/zayo.txt", "r") as zayo_file:
             for line in zayo_file:
                 c.privmsg(destination, line.strip("\n"))
+    if command == "orly":
+        with open("files/core/orly.txt", "r") as orly_file:
+            for line in orly_file:
+                c.privmsg(destination, line.strip("\n"))
     if command == "help":
         c.privmsg(destination, "no help for now, but the code says it works")
 
@@ -50,7 +54,8 @@ def apply(self, c, e, command, arguments):
                 c.privmsg(destination, f" - {f_modified}")
 
     if command == "code":
-        c.privmsg(destination, "https://git.servens.org/mikachu/ircbots")
+        url = subprocess.check_output(["git", "remote", "get-url", "origin"]).strip().decode("utf-8")
+        c.privmsg(destination, url)
 
     # commandes admin only
     if e.source.nick in self.config.get("admins"):
