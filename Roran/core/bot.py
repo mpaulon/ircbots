@@ -25,10 +25,16 @@ class Bot(irc.bot.SingleServerIRCBot):
             self.config.get("server", dict()).get("port", 6667)
         )
 
+        strategy = irc.bot.ExponentialBackoff(
+            min_interval=self.config.get("min_reconnect_interval", 5),
+            max_interval=self.config.get("max_reconnect_interval", 1800),
+        )
+
         super().__init__(
             [self.server],
             self.config.get("nick", "Roran"),
-            self.config.get("realname", "Roran")
+            self.config.get("realname", "Roran"),
+            recon=strategy,
                 )
 
         self.cache: dict = dict()
@@ -144,3 +150,7 @@ class Bot(irc.bot.SingleServerIRCBot):
             self.commands.apply(self, c, e, action[0], action[1])
             for module in self.modules:
                 module.apply_command(self, c, e, action[0], action[1])
+
+    def on_disconnect(self, c: irc.client.ServerConnection, e: irc.client.Event):
+        self.logger.error("Lost connection")
+        self.logger.debug(str(e))
